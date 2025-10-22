@@ -23,12 +23,12 @@ class IndexView(TemplateView):
 
 
 class CatalogView(TemplateView):
-    template = 'catalog/base.html'
+    template_name = 'catalog/base.html'
     FILTER_MAPPING={
         'color':lambda queryset,value: queryset.filter(color__iexact=value),
         'min_price':lambda queryset,value: queryset.filter(price_gte=value),
         'max_price':lambda queryset,value: queryset.filter(price_ite=value),
-        'size':lambda queryset,value: queryset.filter(product_size__size__name=value),     
+        'size':lambda queryset,value: queryset.filter(product_sizes__size__name=value),     
     }
 
 
@@ -82,7 +82,7 @@ class CatalogView(TemplateView):
                 return TemplateResponse(request,'catalog/search_input.html',context)
             elif context.get('reset_search'):
                 return TemplateResponse(request,'catalog/search_button.html',{})
-            template = 'catalog/filter_model.html' if request.GET.get('show_filters') == 'true' else 'catalog/catalog.html'
+            template = 'catalog/filter_modal.html' if request.GET.get('show_filters') == 'true' else 'catalog/catalog.html'
             return TemplateResponse(request,template,context)
         return TemplateResponse(request,self.template_name,context)
     
@@ -105,11 +105,11 @@ class ProductDetailView(DetailView):
         return context
     
     def get(self,request,*args,**kwargs):
-        self.objcet = self.get_object()
+        self.object = self.get_object()
         context = self.get_context_data(**kwargs)
-        if request.header.get('HX-Request'):
+        if request.headers.get('HX-Request'):
             return TemplateResponse(request,'catalog/product_detail.html',context)
-        raise TemplateResponse(request,self.template_name,context)
+        return TemplateResponse(request,self.template_name,context)
     
 
 
