@@ -27,7 +27,7 @@ class CartModalView(CartMixin,View):
     def get(self,request):
         cart = self.get_cart(request)
         context = {'cart':cart,
-                    'cart_items':cart.items.select_releated(
+                    'cart_items':cart.items.select_related(
                     "product",
                     "product_size__size",).order_by('-added_at')}
         
@@ -106,7 +106,7 @@ class UpdateCartItemView(CartMixin,View):
         request.session.modified = True
 
         context = {'cart':cart,
-                   'cart_items':cart.items.select_releated(
+                   'cart_items':cart.items.select_related(
                        "product",
                        "product_size__size",).order_by('-added_at')}
     
@@ -122,7 +122,7 @@ class RemoveCartItemView(CartMixin,View):
             cart_item.delete()
             request.session['cart_id'] = cart.id
             request.session.modified = True
-            context = {'cart':cart,'cart_items':cart.items.select_releated('product','product_size__size',).order_by('-added_at')}
+            context = {'cart':cart,'cart_items':cart.items.select_related('product','product_size__size',).order_by('-added_at')}
 
             return TemplateResponse(request,'cart/cart_modal.html',context)
 
@@ -161,7 +161,7 @@ class CartSummaryView(CartMixin,View):
     def get(self,request):
         cart = self.get_cart(request)
         context={'cart':cart,
-                 'cart_items':cart.items.select_releated(
+                 'cart_items':cart.items.select_related(
                      'product',
                      'product_size__size',
                  ).order_by('-added_at')}
