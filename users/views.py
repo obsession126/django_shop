@@ -31,9 +31,10 @@ def login_view(request):
             user = form.get_user()
             login(request,user,backend='django.contrib.auth.backends.ModelBackend')
             return redirect('catalog:index')
-        else:
-            form = CustomUserLoginForm()
         return render(request,'users/register.html',{'form':form})
+    
+    form = CustomUserLoginForm()
+    return render(request,'users/login.html',{'form':form})
     
 
 @login_required(login_url='/users/login')
@@ -79,8 +80,9 @@ def update_account_details(request):
             request.user = updated_user
             if request.headers.get('HX-Request'):
                 return TemplateResponse(request,'users/partials/account_details',{'user':updated_user})
-            
-            return TemplateResponse(request,'users/partials/account_details.html',{'user':updated_user})
+            if request.headers.get('HX-Request'):
+                return TemplateResponse(request, 'users/partials/account_details.html', {'user': updated_user})
+
         else:
             return TemplateResponse(request,'users/partials/edit_account_details.html',{'user':request.user,'form':form})
         
