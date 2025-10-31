@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}ENFANTS RICHES DÉPRIMÉS{% endblock %}</title>
+    <title>{% block title %}SHOP NAME{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
@@ -117,8 +117,8 @@
         <div class="p-6">
             <div class="flex justify-between items-center mb-8">
                 <h2 class="text-lg font-bold tracking-tight text-left">
-                    ENFANTS RICHES <br>
-                    DÉPRIMÉS
+                    SHOP <br>
+                    NAME
                 </h2>   
                 <button id="closeMenu" class="hamburger active">
                     <span></span>
@@ -179,8 +179,8 @@
                        hx-target="#main-content" 
                        hx-push-url="true">
                         <h1 class="text-sm sm:text-lg font-bold tracking-tight text-left">
-                            ENFANTS RICHES <br>
-                            DÉPRIMÉS
+                            SHOP <br>
+                            NAME
                         </h1>
                     </a>
                 </div>
@@ -192,6 +192,7 @@
                        hx-get="{% url 'catalog:catalog' category.slug %}" 
                        hx-target="#main-content" 
                        hx-push-url="true"
+
                        class="nav-link text-sm font-medium text-gray-900 hover:text-gray-700 {% if current_category == category.slug %}active{% endif %}">
                        {{ category.name|upper }}
                     </a>
@@ -208,20 +209,32 @@
                                 class="text-sm font-medium uppercase hover:text-gray-600">
                             SEARCH
                         </button>
+                {% if user.is_authenticated %}
                     </div>
-                    <a href="{% url 'users:profile' %}" 
-                    hx-get="{% url 'users:profile' %}" 
-                    hx-target="#main-content" 
-                    hx-push-url="true"
-                    class="text-sm font-medium text-gray-900 uppercase hover:text-gray-600">
-                        ACCOUNT
-                    </a>
-                    <a href="#" id="desktopCart" class="text-sm font-medium text-gray-900 hover:text-gray-700">CART (0)</a>
-                </div>
-                
+                        <a href="{% url 'users:profile' %}" 
+                        hx-get="{% url 'users:profile' %}" 
+                        hx-target="#main-content" 
+                        hx-push-url="true"
+                        class="text-sm font-medium text-gray-900 uppercase hover:text-gray-600">
+                            PROFILE
+                        </a>
+                        <a href="" id="desktopCart" class="text-sm font-medium text-gray-900 hover:text-gray-700">CART (0)</a>
+                    </div>
+                {% else %}
+                    </div>
+                        <a href="{% url 'users:register' %}" 
+                        hx-get="{% url 'users:register' %}" 
+                        hx-target="#main-content" 
+                        hx-push-url="true"
+                        class="text-sm font-medium text-gray-900 uppercase hover:text-gray-600">
+                            SIGN UP
+                        </a>
+                        <a href="" id="desktopCart" class="text-sm font-medium text-gray-900 hover:text-gray-700">CART (0)</a>
+                    </div>
+                {% endif %}             
                 <!-- Mobile Cart Icon -->
                 <div class="md:hidden">
-                    <a href="#" id="mobileCartHeader" class="text-xs font-medium text-gray-900">CART (0)</a>
+                    <a href="" id="mobileCartHeader" class="text-xs font-medium text-gray-900">CART (0)</a>
                 </div>
             </div>
         </div>
@@ -238,7 +251,7 @@
         <main class="mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="text-center py-20">
                 <h2 class="text-4xl font-bold tracking-tight text-gray-900 mb-4">
-                    ENFANTS RICHES DÉPRIMÉS
+                    SHOP NAME
                 </h2>
                 <p class="text-lg text-gray-600 mb-8">
                     Select a category to browse our collection
@@ -373,6 +386,16 @@
             if (mobileCart) mobileCart.textContent = cartText;
             if (mobileCartHeader) mobileCartHeader.textContent = cartText;
         };
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {  // сторінка з кешу браузера
+                const mainContent = document.getElementById('main-content');
+                if (mainContent) {
+                    const url = window.location.href;
+                    htmx.ajax('GET', url, { target: '#main-content', swap: 'innerHTML' });
+                }
+            }
+        });
     </script>
+    
 </body>
 </html>

@@ -22,16 +22,15 @@
         <!-- Product Images -->
         <div class="space-y-4">
             <!-- Main Image -->
-            <div class="w-full aspect-square overflow-hidden bg-gray-100 rounded-lg">
+            <div class="aspect-square overflow-hidden bg-gray-100">
                 {% if product.main_image %}
-                <img id="mainProductImage"
-                    src="{{ product.main_image.url }}"
-                    alt="{{ product.name }}"
-                    class="w-full h-full object-contain">
+                    <img src="{{ product.main_image.url }}" 
+                         alt="{{ product.name }}" 
+                         class="w-full h-full object-cover">
                 {% else %}
-                <div class="w-full h-full bg-gray-200 flex items-center justify-center">
-                    <span class="text-gray-400">No Image</span>
-                </div>
+                    <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                        <span class="text-gray-400">No Image</span>
+                    </div>
                 {% endif %}
             </div>
 
@@ -39,11 +38,11 @@
             {% if product.images.all %}
             <div class="grid grid-cols-3 gap-2">
                 {% for image in product.images.all %}
-                <div class="w-full aspect-square overflow-hidden bg-gray-100 rounded-lg cursor-pointer hover:opacity-80">
-                    <img src="{{ image.image.url }}"
-                        alt="{{ product.name }}"
-                        class="w-full h-full object-contain"
-                        onclick="document.getElementById('mainProductImage').src=this.src">
+                <div class="aspect-square overflow-hidden bg-gray-100 cursor-pointer hover:opacity-80">
+                    <img src="{{ image.image.url }}" 
+                         alt="{{ product.name }}" 
+                         class="w-full h-full object-cover"
+                         onclick="changeMainImage(this.src)">
                 </div>
                 {% endfor %}
             </div>
@@ -51,74 +50,74 @@
         </div>
 
         <!-- Product Info -->
-        <div class="space-y-6">
-            <div>
-                <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 mb-2">
-                    {{ product.name|upper }}
-                </h1>
-                <p class="text-lg text-gray-600 mb-4">{{ product.color|upper }}</p>
-                <p class="text-2xl font-bold text-gray-900">${{ product.price }}</p>
-            </div>
+        <div id="product-detail" data-slug="{{ product.slug }}">
+            <div class="space-y-6">
+                <div>
+                    <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 mb-2">
+                        {{ product.name|upper }}
+                    </h1>
+                    <p class="text-lg text-gray-600 mb-4">{{ product.color|upper }}</p>
+                    <p class="text-2xl font-bold text-gray-900">${{ product.price }}</p>
+                </div>
 
-            <!-- Sizes -->
-            {% if product.product_sizes.all %}
-            <div>
-                <h3 class="text-sm font-medium text-gray-900 mb-3">SIZE</h3>
-                <div class="grid grid-cols-4 gap-2">
-                    {% for ps in product.product_sizes.all %}
-                    <div class="size-option">
-                        <input type="radio" 
-                            name="size" 
-                            class="size-radio hidden"
-                            id="size-{{ ps.size.id }}"
-                            value="{{ ps.size.id }}"
-                            data-size="{{ ps.size.name }}"
-                            {% if ps.stock == 0 %}disabled{% endif %}
-                            {% if forloop.first and ps.stock > 0 %}checked{% endif %}>
-                        <label for="size-{{ ps.size.id }}"
-                            class="block border border-gray-300 py-2 px-3 text-sm font-medium text-center cursor-pointer hover:border-gray-900 transition-colors {% if ps.stock == 0 %}opacity-50 cursor-not-allowed{% endif %}">
-                            {{ ps.size.name }}
-                        </label>
+                <!-- Sizes -->
+                {% if product.product_sizes.all %}
+                <div>
+                    <h3 class="text-sm font-medium text-gray-900 mb-3">SIZE</h3>
+                    <div class="grid grid-cols-4 gap-2">
+                        {% for product_size in product.product_sizes.all %}
+                        <div class="size-option">
+                            <input type="radio" 
+                                name="size" 
+                                class="size-radio hidden"
+                                id="size-{{ product_size.id }}"
+                                value="{{ product_size.id }}"
+                                data-size="{{ product_size.size.name }}"
+                                {% if product_size.stock == 0 %}disabled{% endif %}
+                                {% if forloop.first and product_size.stock > 0 %}checked{% endif %}>
+                            <label for="size-{{ product_size.id }}"
+                                class="block border border-gray-300 py-2 px-3 text-sm font-medium text-center cursor-pointer hover:border-gray-900 transition-colors {% if product_size.stock == 0 %}opacity-50 cursor-not-allowed{% endif %}">
+                                {{ product_size.size.name }}
+                            </label>
+                        </div>
+                        {% endfor %}
                     </div>
-                    {% endfor %}
                 </div>
-            </div>
-            {% else %}
-            <div>
-                <h3 class="text-sm font-medium text-gray-900 mb-3">SIZE</h3>
-                <p class="text-sm text-gray-600">No sizes available</p>
-            </div>
-            {% endif %}
-            <!-- Add to Cart -->
-            <div class="space-y-4">
-                <button id="add-to-cart-btn" 
-                        class="w-full bg-black text-white py-3 px-6 text-sm font-medium hover:bg-gray-800 transition-colors"
-                        onclick="addToCart()"
-                        {% if not product.product_sizes.all %}disabled{% endif %}>
-                    ADD TO CART
-                </button>
-                
-                <button class="w-full border border-gray-300 py-3 px-6 text-sm font-medium hover:border-gray-900 transition-colors">
-                    ADD TO WISHLIST
-                </button>
-            </div>
-
-            <!-- Product Details -->
-            <div class="border-t border-gray-200 pt-6">
-                <h3 class="text-sm font-medium text-gray-900 mb-3">DETAILS</h3>
-                <div class="prose prose-sm text-gray-600">
-                    <p>{{ product.description|linebreaks }}</p>
-                    <p>Created: {{ product.created_at|date:"F d, Y" }}</p>
+                {% else %}
+                <div>
+                    <h3 class="text-sm font-medium text-gray-900 mb-3">SIZE</h3>
+                    <p class="text-sm text-gray-600">No sizes available</p>
                 </div>
-            </div>
+                {% endif %}
 
-            <!-- Care Instructions -->
-            <div class="border-t border-gray-200 pt-6">
-                <h3 class="text-sm font-medium text-gray-900 mb-3">CARE</h3>
-                <div class="prose prose-sm text-gray-600">
-                    <p>Professional dry clean only</p>
-                    <p>Do not bleach</p>
-                    <p>Iron at low temperature</p>
+                <!-- Add to Cart -->
+                <div class="space-y-4">
+                    <button id="add-to-cart-btn" 
+                            class="w-full bg-black text-white py-3 px-6 text-sm font-medium hover:bg-gray-800 transition-colors"
+                            onclick="addToCart()"
+                            {% if not product.product_sizes.all %}disabled{% endif %}>
+                        ADD TO CART
+                    </button>
+                    
+                </div>
+
+                <!-- Product Details -->
+                <div class="border-t border-gray-200 pt-6">
+                    <h3 class="text-sm font-medium text-gray-900 mb-3">DETAILS</h3>
+                    <div class="prose prose-sm text-gray-600">
+                        <p>{{ product.description|linebreaks }}</p>
+                        <p>Created: {{ product.created_at|date:"F d, Y" }}</p>
+                    </div>
+                </div>
+
+                <!-- Care Instructions -->
+                <div class="border-t border-gray-200 pt-6">
+                    <h3 class="text-sm font-medium text-gray-900 mb-3">CARE</h3>
+                    <div class="prose prose-sm text-gray-600">
+                        <p>Professional dry clean only</p>
+                        <p>Do not bleach</p>
+                        <p>Iron at low temperature</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -134,7 +133,7 @@
                  hx-get="{% url 'catalog:product_detail' related_product.slug %}"
                  hx-target="#main-content"
                  hx-push-url="true">
-                <div class="aspect-square bg-gray-100 flex items-center justify-center">
+                <div class="aspect-square overflow-hidden bg-gray-100 mb-4">
                     {% if related_product.main_image %}
                         <img src="{{ related_product.main_image.url }}" 
                              alt="{{ related_product.name }}" 
@@ -152,9 +151,76 @@
                 </div>
             </div>
             {% endfor %}
+
+
+            
         </div>
     </div>
     {% endif %}
+
+    <div class="mt-20 border-t border-gray-200 pt-10" id ='reviews-container'>
+        <h2 class="text-xl font-bold tracking-tight text-gray-900 mb-6">CUSTOMER REVIEWS</h2>
+
+        {% if product.reviews.all %}
+            <div class="space-y-6 mb-10" id='id="reviews-container"'>
+                {% for review in product.reviews.all %}
+                    <div class="border border-gray-200 rounded-lg p-4 bg-gray-50 shadow-sm">
+                        <div class="flex justify-between items-center mb-2">
+                            <p class="font-semibold text-gray-900">{{ review.user.first_name }} {{ review.user.last_name }}</p>
+                            <div class="flex items-center space-x-1 text-yellow-500">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= review.rating %}
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.975a1 1 0 00.95.69h4.184c.969 0 1.371 1.24.588 1.81l-3.39 2.463a1 1 0 00-.364 1.118l1.287 3.975c.3.922-.755 1.688-1.54 1.118l-3.39-2.463a1 1 0 00-1.176 0l-3.39 2.463c-.785.57-1.84-.196-1.54-1.118l1.287-3.975a1 1 0 00-.364-1.118L2.04 9.402c-.783-.57-.38-1.81.588-1.81h4.184a1 1 0 00.95-.69l1.287-3.975z"/></svg>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <p class="text-gray-700 text-sm mb-2">{{ review.text }}</p>
+                        <p class="text-xs text-gray-500">
+                            AI Sentiment: 
+                            <span class="{% if review.sentiment_score > 0 %}text-green-600{% elif review.sentiment_score < 0 %}text-red-600{% else %}text-gray-600{% endif %}">
+                                {{ review.sentiment_score|floatformat:2 }}
+                            </span>
+                        </p>
+                    </div>
+
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-gray-500 mb-10">No reviews yet. Be the first to leave one!</p>
+        {% endif %}
+
+        {% if user.is_authenticated %}
+            <form method="post" class="space-y-4 bg-gray-50 p-6 rounded-lg border border-gray-200 shadow-sm">
+                {% csrf_token %}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Your Rating</label>
+                    <div class="flex space-x-2">
+                        {% for i in rating_range %}
+                            <label>
+                                <input type="radio" name="rating" value="{{ i }}" class="hidden peer" />
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                    class="h-6 w-6 text-gray-300 peer-checked:text-yellow-500 hover:text-yellow-400 transition"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.975a1 1 0 00.95.69h4.184c.969 0 1.371 1.24.588 1.81l-3.39 2.463a1 1 0 00-.364 1.118l1.287 3.975c.3.922-.755 1.688-1.54 1.118l-3.39-2.463a1 1 0 00-1.176 0l-3.39 2.463c-.785.57-1.84-.196-1.54-1.118l1.287-3.975a1 1 0 00-.364-1.118L2.04 9.402c-.783-.57-.38-1.81.588-1.81h4.184a1 1 0 00.95-.69l1.287-3.975z"/>
+                                </svg>
+                            </label>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Your Review</label>
+                    {{ form.text }}
+                </div>
+                <button type="submit" class="w-full bg-black text-white py-3 px-6 text-sm font-medium hover:bg-gray-800 transition-colors"> Submit Review </button
+            </form>
+        {% else %}
+            <div class="text-center bg-gray-50 border border-gray-200 p-6 rounded-lg shadow-sm">
+                <p class="text-gray-700">You must <a href="{% url 'users:login' %}" class="text-black underline hover:text-gray-700">log in</a> to leave a review.</p>
+            </div>
+        {% endif %}
+    </div>
 </main>
 
 <style>
@@ -193,51 +259,62 @@
             console.log('No valid size selected');
         }
     }
-    function addToCart() {
-        const productSlug = '{{ product.slug }}';
-        console.log('Product Slug:', productSlug);
-        
-        // Update selected size before sending
-        updateSelectedSize();
-        console.log('Selected Size ID:', selectedSizeId);
 
-        if (!selectedSizeId) {
-            showNotification('Please select a size');
+function addToCart() {
+    const productSlug = document.querySelector('#product-detail').dataset.slug;
+    console.log('Product Slug:', productSlug);
+
+    updateSelectedSize();
+    console.log('Selected Size ID:', selectedSizeId);
+
+    if (!selectedSizeId) {
+        showNotification('Please select a size');
+        return;
+    }
+
+    let formData = new FormData();
+    formData.append('size_id', selectedSizeId);
+    formData.append('quantity', '1');
+
+    fetch(`/cart/add/${productSlug}/`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        }
+    })
+    .then(async response => {
+        console.log('Response Status:', response.status);
+        const text = await response.text();
+        let data;
+
+        try {
+            data = JSON.parse(text);
+        } catch {
+            console.error('Non-JSON response:', text);
+            showNotification('Unexpected response from server');
             return;
         }
 
-        let formData = new FormData();
-        formData.append('size_id', selectedSizeId);
-        formData.append('quantity', '1');
-        fetch(`{% url 'cart:add_to_cart' 'PLACEHOLDER' %}`.replace('PLACEHOLDER', productSlug), {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken')
-            }
-        })
-        .then(response => {
-            console.log('Response Status:', response.status);
-            return response.json();
-        })
-        .then(data => {
-            console.log('Response Data:', data);
-            if (data.error) {
-                showNotification(data.error);
-            } else {
-                updateHeaderCartCount(data.total_items);
-                showNotification(data.message);
-                htmx.ajax('GET', '{% url "cart:cart_modal" %}', {
+        if (data.error) {
+            showNotification(data.error);
+        } else {
+            updateHeaderCartCount(data.total_items);
+            showNotification(data.message);
+
+            if (window.htmx) {
+                htmx.ajax('GET', '/cart/', {
                     target: '#cart-container',
                     swap: 'innerHTML'
                 });
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showNotification('Error adding to cart');
-        });
-    }
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error adding to cart');
+    });
+}
     
     function getCookie(name) {
         let cookieValue = null;

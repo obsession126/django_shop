@@ -19,7 +19,7 @@ def get_cart_count(context):
     
 
 @register.filter
-def multiply(valuy,arg):
+def multiply(value,arg):
     try:
         return float(value) * float(arg)
     
