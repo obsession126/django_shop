@@ -10,8 +10,8 @@ from django.db.models import Avg
 
 analyzer = SentimentIntensityAnalyzer()
 def analyze_review_text(text):
-     result = analyzer.polarity_scores(text)
-     return result['compound']
+    result = analyzer.polarity_scores(text)
+    return result['compound']
 
 
 class Category(models.Model):
@@ -108,7 +108,7 @@ class Review(models.Model):
     sentiment_score = models.FloatField(default=0.0)
     created_at = models.DateTimeField(auto_now_add=True)
 
-  
+
 
     def save(self, *args, **kwargs):
         self.sentiment_score = analyze_review_text(self.text)
